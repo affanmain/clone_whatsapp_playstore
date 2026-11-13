@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Google Play</title>
+<style>
+  :root{
+    --green:#01875f;
+    --green-dark:#016f4e;
+    --text:#202124;
+    --sub:#5f6368;
+    --line:#e8eaed;
+    --chip:#f1f3f4;
+    --blue:#1a73e8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:"Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:#e9ecef;
+    color:var(--text);
+    overflow:hidden;
+  }
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input{font-family:inherit;}
+
+  /* ---------- App shell ---------- */
+  .phone{
+    position:relative;
+    max-width:760px;
+    height:100vh;
+    height:100dvh;
+    margin:0 auto;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 0 60px rgba(0,0,0,.14);
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 16px 8px;
+    background:#fff;
+    flex-shrink:0;
+  }
+  .logo{
+    width:30px;height:30px;flex-shrink:0;
+    display:grid;place-items:center;
+  }
+  .searchwrap{
+    flex:1;
+    display:flex;align-items:center;gap:10px;
+    background:var(--chip);
+    border-radius:24px;
+    padding:9px 16px;
+    transition:background .18s, box-shadow .18s;
+    min-width:0;
+  }
+  .searchwrap:focus-within{
+    background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.18), 0 0 0 1px var(--line);
+  }
+  .searchwrap svg{flex-shrink:0;color:var(--sub);}
+  .searchwrap input{
+    flex:1;border:none;background:transparent;outline:none;
+    font-size:15px;color:var(--text);min-width:0;
+  }
+  .searchwrap input::placeholder{color:var(--sub);}
+  .avatar{
+    width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,#1a73e8,#7b1fa2);
+    color:#fff;font-size:14px;font-weight:600;
+    display:grid;place-items:center;flex-shrink:0;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;gap:6px;
+    padding:0 16px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+    flex-shrink:0;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    position:relative;
+    padding:12px 14px 14px;
+    font-size:14px;font-weight:500;
+    color:var(--sub);
+    white-space:nowrap;
+    transition:color .15s;
+  }
+  .tab.active{color:var(--green);}
+  .tab.active::after{
+    content:"";position:absolute;left:8px;right:8px;bottom:0;height:3px;
+    background:var(--green);border-radius:3px 3px 0 0;
+  }
+
+  /* ---------- Main scroll area ---------- */
+  main{
+    flex:1;overflow-y:auto;overflow-x:hidden;
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+  main::-webkit-scrollbar{width:6px;}
+  main::-webkit-scrollbar-thumb{background:#dadce0;border-radius:3px;}
+
+  /* ---------- Bottom nav ---------- */
+  .bottomnav{
+    display:flex;
+    border-top:1px solid var(--line);
+    background:#fff;
+    flex-shrink:0;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .navitem{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:9px 2px 8px;
+    font-size:11px;font-weight:500;
+    color:var(--sub);
+    transition:color .15s;
+  }
+  .navitem .ic{
+    width:26px;height:22px;
+    display:grid;place-items:center;
+    border-radius:12px;
+    transition:background .2s;
+  }
+  .navitem.active{color:var(--green);}
+  .navitem.active .ic{background:#e6f4ea;}
+  .navitem:active .ic{background:#e8f0fe;}
+
+  /* ---------- Hero carousel ---------- */
+  .hero{
+    display:flex;gap:12px;
+    padding:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+  }
+  .hero::-webkit-scrollbar{display:none;}
+  .hero-card{
+    position:relative;
+    min-width:290px;height:170px;
+    border-radius:18px;
+    padding:18px;
+    color:#fff;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    overflow:hidden;
+    scroll-snap-align:start;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:transform .18s, box-shadow .18s;
+  }
+  .hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.2);}
+  .hero-card .bigemoji{
+    position:absolute;right:-6px;top:-6px;
+    font-size:96px;opacity:.28;
+    transform:rotate(-12deg);
+    pointer-events:none;
+  }
+  .hero-badge{
+    font-size:10px;font-weight:700;letter-spacing:1.2px;
+    opacity:.85;margin-bottom:4px;
+  }
+  .hero-title{font-size:19px;font-weight:600;line-height:1.2;}
+  .hero-sub{font-size:12.5px;opacity:.85;margin-top:3px;}
+
+  /* ---------- Section headers ---------- */
+  .sec-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 16px 10px;
+  }
+  .sec-head h2{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px;}
+  .sec-head .more{font-size:13px;font-weight:600;color:var(--green);}
+
+  /* ---------- Horizontal card row ---------- */
+  .hrow{
+    display:flex;gap:10px;
+    padding:0 16px 6px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .hrow::-webkit-scrollbar{display:none;}
+  .hcard{
+    width:124px;flex-shrink:0;
+    display:flex;flex-direction:column;align-items:center;
+    gap:7px;
+    padding:12px 6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+    transition:background .15s;
+    text-align:center;
+  }
+  .hcard:hover{background:#f8f9fa;}
+  .hcard .nm{
+    font-size:12.5px;font-weight:500;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .hcard .rt{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:3px;}
+
+  /* ---------- App icon ---------- */
+  .appicon{
+    border-radius:22%;
+    display:grid;place-items:center;
+    flex-shrink:0;
+    box-shadow:0 1px 4px rgba(0,0,0,.16);
+    user-select:none;
+  }
+
+  /* ---------- Vertical list ---------- */
+  .vrow{
+    display:flex;gap:14px;align-items:center;
+    padding:11px 16px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .vrow:hover{background:#f8f9fa;}
+  .vrow .meta{flex:1;min-width:0;}
+  .vrow .nm{
+    font-size:14px;font-weight:500;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .vrow .dv{
+    font-size:12px;color:var(--sub);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-top:1px;
+  }
+  .vrow .rt{
+    font-size:12px;color:var(--sub);
+    display:flex;align-items:center;gap:4px;margin-top:3px;
+  }
+  .rank{
+    width:20px;flex-shrink:0;
+    font-size:15px;font-weight:600;color:var(--sub);
+    text-align:center;
+  }
+
+  /* ---------- Install pills ---------- */
+  .pill{
+    flex-shrink:0;
+    padding:7px 18px;
+    border-radius:18px;
+    font-size:13px;font-weight:600;
+    color:var(--green);
+    background:transparent;
+    border:1px solid #dadce0;
+    transition:background .15s,border-color .15s;
+    min-width:78px;
+    text-align:center;
+  }
+  .pill:hover{background:#e6f4ea;border-color:transparent;}
+  .pill.done{color:var(--green);border-color:#dadce0;}
+  .pill.busy{
+    padding:7px 10px;min-width:78px;
+    color:var(--sub);font-weight:500;
+  }
+  .miniprog{
+    width:100%;height:3px;border-radius:3px;background:#dadce0;overflow:hidden;margin-top:5px;
+  }
+  .miniprog i{display:block;height:100%;background:var(--green);width:0;animation:fill 1.6s ease forwards;}
+  @keyframes fill{to{width:100%;}}
+
+  /* ---------- Categories grid ---------- */
+  .catgrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:10px;
+    padding:16px;
+  }
+  .cattile{
+    display:flex;align-items:center;gap:12px;
+    padding:14px;
+    border-radius:14px;
+    background:#f8f9fa;
+    font-size:13.5px;font-weight:500;
+    cursor:pointer;
+    transition:background .15s,transform .15s;
+    text-align:left;
+  }
+  .cattile:hover{background:#e8eaed;transform:translateY(-1px);}
+  .cattile span{font-size:22px;}
+
+  /* ---------- Chips ---------- */
+  .chips{
+    display:flex;gap:8px;padding:4px 16px 12px;
+    overflow-x:auto;scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    padding:7px 15px;border-radius:16px;
+    background:#fff;border:1px solid #dadce0;
+    font-size:13px;font-weight:500;color:var(--sub);
+    white-space:nowrap;flex-shrink:0;
+    transition:background .15s,color .15s;
+  }
+  .chip:hover{background:#f1f3f4;}
+  .chip.on{background:#e6f4ea;border-color:transparent;color:var(--green);font-weight:600;}
+
+  .backline{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 16px 4px;
+  }
+  .backline button{
+    display:flex;align-items:center;gap:6px;
+    font-size:14px;font-weight:600;color:var(--green);
+  }
+
+  .empty{
+    padding:80px 24px;text-align:center;color:var(--sub);
+  }
+  .empty .em{font-size:52px;margin-bottom:12px;}
+  .empty p{margin:6px 0;font-size:14px;}
+
+  .divider{height:8px;background:#f8f9fa;margin-top:12px;}
+
+  /* ---------- Detail overlay ---------- */
+  .detail{
+    position:absolute;inset:0;
+    background:#fff;
+    z-index:60;
+    display:flex;flex-direction:column;
+    transform:translateX(100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    visibility:hidden;
+  }
+  .detail.open{transform:translateX(0);visibility:visible;}
+  .dbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px;
+    flex-shrink:0;
+  }
+  .iconbtn{
+    width:40px;height:40px;border-radius:50%;
+    display:grid;place-items:center;color:var(--text);
+    transition:background .15s;
+  }
+  .iconbtn:hover{background:#f1f3f4;}
+  .dscroll{flex:1;overflow-y:auto;padding-bottom:40px;}
+
+  .dhead{display:flex;gap:16px;padding:6px 20px 16px;align-items:center;}
+  .dhead h1{
+    margin:0;font-size:22px;font-weight:600;letter-spacing:-.3px;line-height:1.2;
+  }
+  .dhead .dv{font-size:13px;color:var(--green);font-weight:500;margin-top:4px;}
+  .dhead .sub{font-size:12px;color:var(--sub);margin-top:2px;}
+
+  .stats{
+    display:flex;align-items:center;gap:0;
+    padding:8px 20px 20px;
+    overflow-x:auto;scrollbar-width:none;
+  }
+  .stats::-webkit-scrollbar{display:none;}
+  .stat{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:0 20px;flex-shrink:0;
+  }
+  .stat:first-child{padding-left:0;}
+  .stat b{font-size:14px;font-weight:600;display:flex;align-items:center;gap:3px;}
+  .stat span{font-size:11.5px;color:var(--sub);}
+  .vline{width:1px;height:26px;background:var(--line);flex-shrink:0;}
+
+  .installwrap{padding:0 20px 20px;}
+  .biginstall{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    background:var(--green);
+    color:#fff;
+    font-size:15px;font-weight:600;
+    transition:background .15s, transform .1s;
+  }
+  .biginstall:hover{background:var(--green-dark);}
+  .biginstall:active{transform:scale(.99);}
+  .biginstall.done{background:#fff;color:var(--green);border:1px solid #dadce0;}
+  .biginstall.busy{background:#e6f4ea;color:var(--green);}
+
+  .shots{
+    display:flex;gap:12px;padding:4px 20px 22px;
+    overflow-x:auto;scrollbar-width:none;
+  }
+  .shots::-webkit-scrollbar{display:none;}
+  .shot{
+    width:170px;height:290px;flex-shrink:0;
+    border-radius:14px;
+    display:grid;place-items:center;
+    font-size:58px;
+    box-shadow:0 1px 4px rgba(0,0,0,.14);
+  }
+
+  .block{padding:0 20px 8px;}
+  .block h3{
+    margin:0 0 10px;
+    font-size:16px;font-weight:600;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .block h3 .arw{color:var(--sub);font-size:14px;font-weight:400;}
+  .block p{
+    margin:0;font-size:14px;line-height:1.6;color:#3c4043;
+  }
+  .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+  .tag{
+    padding:6px 14px;border-radius:16px;
+    border:1px solid #dadce0;
+    font-size:12.5px;color:var(--sub);
+  }
+
+  .similar{
+    display:flex;gap:12px;padding:0 20px 24px;
+    overflow-x:auto;scrollbar-width:none;
+  }
+  .similar::-webkit-scrollbar{display:none;}
+  .scard{
+    width:110px;flex-shrink:0;text-align:center;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+  }
+  .scard .nm{
+    font-size:12px;font-weight:500;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+
+  .fadein{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  @media (max-width:420px){
+    .hero-card{min-width:250px;height:150px;}
+    .hcard{width:110px;}
+    .shot{width:150px;height:255px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 24 24">
+        <path fill="#00c4ff" d="M3.6 2.3 13.9 12 3.6 21.7c-.35-.2-.6-.6-.6-1.1V3.4c0-.5.25-.9.6-1.1z"/>
+        <path fill="#00e07a" d="M17.8 8.2 13.9 12 3.6 2.3c.3-.18.7-.2 1.1.03l13.1 5.87z"/>
+        <path fill="#ff3a44" d="M17.8 15.8 4.7 21.7c-.4.23-.8.2-1.1.03L13.9 12l3.9 3.8z"/>
+        <path fill="#ffd400" d="m17.8 8.2 3.1 1.75c.9.5.9 1.6 0 2.1l-3.1 1.75L13.9 12l3.9-3.8z"/>
+      </svg>
+    </div>
+    <label class="searchwrap">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input id="searchInput" type="text" placeholder="Search apps &amp; games" autocomplete="off" spellcheck="false">
+    </label>
+    <button class="avatar" title="Account">A</button>
+  </header>
+
+  <!-- ============ TABS ============ -->
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="foryou">For you</button>
+    <button class="tab" data-tab="top">Top charts</button>
+    <button class="tab" data-tab="categories">Categories</button>
+    <button class="tab" data-tab="new">New</button>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main id="main"></main>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav class="bottomnav" id="bottomnav">
+    <button class="navitem active" data-section="games">
+      <span class="ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zM9.5 13H8v1.5H6.5V13H5v-1.5h1.5V10H8v1.5h1.5V13zm5.5 1.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm3-2.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+      </span>Games
+    </button>
+    <button class="navitem" data-section="apps">
+      <span class="ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+      </span>Apps
+    </button>
+    <button class="navitem" data-section="movies">
+      <span class="ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4v1h-2V4h-2v1h-2V4H8v1H6V4H4v16h2v-1h2v1h2v-1h2v1h2v-1h2v1h2V4h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+      </span>Movies
+    </button>
+    <button class="navitem" data-section="books">
+      <span class="ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+      </span>Books
+    </button>
+    <button class="navitem" data-section="kids">
+      <span class="ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 5v6c0 5.55 3.42 10.74 8 12 4.58-1.26 8-6.45 8-12V5l-8-3zm0 4a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm0 11.5c-1.8 0-3.4-.92-4.35-2.32.02-1.44 2.9-2.18 4.35-2.18 1.44 0 4.33.74 4.35 2.18A5.18 5.18 0 0 1 12 17.5z"/></svg>
+      </span>Kids
+    </button>
+  </nav>
+
+  <!-- ============ DETAIL OVERLAY ============ -->
+  <div class="detail" id="detail"></div>
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const APPS = [
+  /* ---------------- GAMES ---------------- */
+  {id:1,name:"Subway Surfers",dev:"SYBO Games",cat:"games",genre:"Action",rating:4.5,icon:"🏃",c1:"#ff8008",c2:"#ee0979",size:"98 MB",dl:"1B+",age:"7+",
+   desc:"Dash as fast as you can! Dodge the oncoming trains and obstacles in this endless runner. Help Jake, Tricky & Fresh escape from the grumpy Inspector and his dog."},
+  {id:2,name:"Candy Crush Saga",dev:"King",cat:"games",genre:"Puzzle",rating:4.6,icon:"🍬",c1:"#f857a6",c2:"#ff5858",size:"74 MB",dl:"1B+",age:"3+",
+   desc:"Match three or more candies to progress through hundreds of sweet levels. Switch and match your way through this delicious puzzle adventure."},
+  {id:3,name:"Among Us",dev:"Innersloth LLC",cat:"games",genre:"Action",rating:4.1,icon:"👽",c1:"#8e2de2",c2:"#4a00e0",size:"96 MB",dl:"500M+",age:"10+",
+   desc:"Play online or over local WiFi with 4-15 players. Crewmates work together to complete tasks before one or more Impostors kill everyone aboard."},
+  {id:4,name:"Clash of Clans",dev:"Supercell",cat:"games",genre:"Strategy",rating:4.5,icon:"🏰",c1:"#f7971e",c2:"#ffd200",size:"256 MB",dl:"500M+",age:"7+",
+   desc:"Build your village, raise a clan, and compete in epic Clan Wars. Lead your clan to victory and dominate the leaderboards."},
+  {id:5,name:"Free Fire",dev:"Garena",cat:"games",genre:"Action",rating:4.2,icon:"🔥",c1:"#ff512f",c2:"#dd2476",size:"420 MB",dl:"1B+",age:"16+",
+   desc:"A battle royale shooter with 10-minute matches. Land, loot, and survive as the safe zone shrinks around you."},
+  {id:6,name:"Temple Run 2",dev:"Imangi Studios",cat:"games",genre:"Action",rating:4.4,icon:"🗿",c1:"#11998e",c2:"#38ef7d",size:"112 MB",dl:"500M+",age:"7+",
+   desc:"Navigate perilous cliffs, zip lines, mines and forests as you try to escape with the cursed idol."},
+  {id:7,name:"Ludo King",dev:"Gametion",cat:"games",genre:"Casual",rating:4.3,icon:"🎲",c1:"#2193b0",c2:"#6dd5ed",size:"58 MB",dl:"500M+",age:"3+",
+   desc:"The classic board game you grew up with. Play with friends and family online or offline in this modern take on Ludo."},
+  {id:8,name:"Minecraft",dev:"Mojang",cat:"games",genre:"Adventure",rating:4.6,icon:"⛏️",c1:"#3a7bd5",c2:"#00d2ff",size:"620 MB",dl:"50M+",age:"7+",
+   desc:"Explore infinite worlds and build everything from the simplest of homes to the grandest of castles. Play in creative mode with unlimited resources."},
+  {id:9,name:"Genshin Impact",dev:"HoYoverse",cat:"games",genre:"Adventure",rating:4.4,icon:"⚔️",c1:"#654ea3",c2:"#eaafc8",size:"1.2 GB",dl:"100M+",age:"12+",
+   desc:"Step into Teyvat, a vast world teeming with life and element energy. Explore, fight, and uncover the mysteries of this open-world RPG."},
+  {id:10,name:"Roblox",dev:"Roblox Corporation",cat:"games",genre:"Adventure",rating:4.4,icon:"🟥",c1:"#e52d27",c2:"#b31217",size:"148 MB",dl:"500M+",age:"12+",
+   desc:"Roblox is the ultimate virtual universe that lets you play, create, and be anything you can imagine. Join millions of players."},
+  {id:11,name:"Hill Climb Racing 2",dev:"Fingersoft",cat:"games",genre:"Racing",rating:4.5,icon:"🚗",c1:"#f12711",c2:"#f5af19",size:"132 MB",dl:"500M+",age:"3+",
+   desc:"From the creators of the original Hill Climb Racing comes a new racing adventure with multiplayer and tons of vehicles."},
+  {id:12,name:"Asphalt 9: Legends",dev:"Gameloft SE",cat:"games",genre:"Racing",rating:4.5,icon:"🏎️",c1:"#0f2027",c2:"#2c5364",size:"1.8 GB",dl:"100M+",age:"3+",
+   desc:"Take on the world's most fearless drivers and become the next Asphalt Legend. Drive over 60 of the most prestigious cars."},
+  {id:13,name:"Stumble Guys",dev:"Scopely",cat:"games",genre:"Casual",rating:4.4,icon:"🏆",c1:"#ff9966",c2:"#ff5e62",size:"210 MB",dl:"100M+",age:"7+",
+   desc:"Race against 31 players through chaotic obstacle courses. Stumble, dodge and tumble your way to the crown."},
+  {id:14,name:"8 Ball Pool",dev:"Miniclip.com",cat:"games",genre:"Sports",rating:4.5,icon:"🎱",c1:"#134e5e",c2:"#71b280",size:"86 MB",dl:"500M+",age:"3+",
+   desc:"Play the world's biggest multiplayer pool game. Challenge your friends or take on players around the globe."},
+
+  /* ---------------- APPS ---------------- */
+  {id:20,name:"WhatsApp Messenger",dev:"WhatsApp LLC",cat:"apps",genre:"Communication",rating:4.3,icon:"💬",c1:"#25D366",c2:"#075E54",size:"52 MB",dl:"5B+",age:"12+",
+   desc:"Simple. Reliable. Private. Message and call for free, with end-to-end encryption by default."},
+  {id:21,name:"Instagram",dev:"Instagram",cat:"apps",genre:"Social",rating:4.2,icon:"📸",c1:"#feda75",c2:"#d62976",size:"64 MB",dl:"5B+",age:"12+",
+   desc:"Share photos and videos, follow the people and interests you love, and discover new things every day."},
+  {id:22,name:"Spotify: Music and Podcasts",dev:"Spotify AB",cat:"apps",genre:"Music",rating:4.4,icon:"🎵",c1:"#1DB954",c2:"#0d6b31",size:"44 MB",dl:"1B+",age:"12+",
+   desc:"Play millions of songs and podcasts for free. Discover new music, create playlists and listen offline."},
+  {id:23,name:"Netflix",dev:"Netflix, Inc.",cat:"apps",genre:"Entertainment",rating:4.1,icon:"🎬",c1:"#e50914",c2:"#7b0000",size:"38 MB",dl:"1B+",age:"12+",
+   desc:"Watch TV shows and movies, including award-winning Netflix originals. Download and watch offline."},
+  {id:24,name:"Google Maps",dev:"Google LLC",cat:"apps",genre:"Tools",rating:4.3,icon:"🗺️",c1:"#34a853",c2:"#1a73e8",size:"96 MB",dl:"10B+",age:"3+",
+   desc:"Navigate your world faster and easier with real-time GPS navigation, traffic, and transit info."},
+  {id:25,name:"Telegram",dev:"Telegram FZ-LLC",cat:"apps",genre:"Communication",rating:4.5,icon:"✈️",c1:"#0088cc",c2:"#004f7a",size:"70 MB",dl:"1B+",age:"12+",
+   desc:"Pure instant messaging — simple, fast, secure and synced across all your devices."},
+  {id:26,name:"Google Chrome",dev:"Google LLC",cat:"apps",genre:"Tools",rating:4.2,icon:"🌐",c1:"#4285F4",c2:"#0F9D58",size:"180 MB",dl:"10B+",age:"3+",
+   desc:"Fast, secure and easy-to-use web browser with Google Search built in."},
+  {id:27,name:"Uber - Request a ride",dev:"Uber Technologies, Inc.",cat:"apps",genre:"Travel",rating:4.4,icon:"🚕",c1:"#000000",c2:"#434343",size:"88 MB",dl:"500M+",age:"12+",
+   desc:"Get where you want to go with a tap. Request a ride, see the price upfront and pay automatically."},
+  {id:28,name:"TikTok",dev:"TikTok Pte. Ltd.",cat:"apps",genre:"Social",rating:4.3,icon:"🎶",c1:"#25F4EE",c2:"#FE2C55",size:"210 MB",dl:"1B+",age:"16+",
+   desc:"Short-form videos that entertain, inspire and connect. Discover a world of creativity in your feed."},
+  {id:29,name:"Duolingo",dev:"Duolingo",cat:"apps",genre:"Education",rating:4.6,icon:"🦉",c1:"#58cc02",c2:"#2b8000",size:"62 MB",dl:"500M+",age:"3+",
+   desc:"Learn a language with fun, bite-sized lessons. Practice speaking, reading, listening and writing."},
+  {id:30,name:"Discord",dev:"Discord Inc.",cat:"apps",genre:"Communication",rating:4.3,icon:"🎮",c1:"#5865F2",c2:"#2c3499",size:"120 MB",dl:"100M+",age:"12+",
+   desc:"A place to talk, hang out and build communities — voice, video and text, all in one."},
+  {id:31,name:"Zoom Workplace",dev:"zoom.us",cat:"apps",genre:"Productivity",rating:4.1,icon:"📹",c1:"#2D8CFF",c2:"#0b4ea2",size:"150 MB",dl:"500M+",age:"3+",
+   desc:"Stay connected with reliable video meetings, phone calls, chat and more — from anywhere."},
+  {id:32,name:"Microsoft Word",dev:"Microsoft Corporation",cat:"apps",genre:"Productivity",rating:4.5,icon:"📝",c1:"#2b579a",c2:"#123a70",size:"120 MB",dl:"1B+",age:"3+",
+   desc:"Create, edit and share documents anywhere. Word gives you the tools to write with confidence."},
+  {id:33,name:"Amazon Shopping",dev:"Amazon Mobile LLC",cat:"apps",genre:"Shopping",rating:4.3,icon:"📦",c1:"#ff9900",c2:"#c45500",size:"72 MB",dl:"500M+",age:"12+",
+   desc:"Shop millions of products, compare prices, track packages and get fast delivery."},
+  {id:34,name:"ChatGPT",dev:"OpenAI",cat:"apps",genre:"Productivity",rating:4.7,icon:"🤖",c1:"#10a37f",c2:"#0b6b53",size:"46 MB",dl:"100M+",age:"12+",
+   desc:"Ask anything, get instant answers, brainstorm ideas, and get help with writing and learning."},
+  {id:35,name:"Pinterest",dev:"Pinterest",cat:"apps",genre:"Social",rating:4.4,icon:"📌",c1:"#E60023",c2:"#8b0015",size:"56 MB",dl:"500M+",age:"12+",
+   desc:"Find inspiration for recipes, home decor, style and everything in between."},
+
+  /* ---------------- MOVIES ---------------- */
+  {id:40,name:"Dune: Part Two",dev:"Warner Bros.",cat:"movies",genre:"Sci-Fi",rating:4.6,icon:"🏜️",c1:"#c79081",c2:"#8b5a2b",size:"2.4 GB",dl:"10M+",age:"13+",
+   desc:"Paul Atreides unites with the Fremen to wage war against the House Harkonnen and fulfill his destiny."},
+  {id:41,name:"Oppenheimer",dev:"Universal Pictures",cat:"movies",genre:"Drama",rating:4.5,icon:"💥",c1:"#232526",c2:"#414345",size:"2.9 GB",dl:"10M+",age:"16+",
+   desc:"The story of J. Robert Oppenheimer and his role in the development of the atomic bomb."},
+  {id:42,name:"Barbie",dev:"Warner Bros.",cat:"movies",genre:"Comedy",rating:4.2,icon:"💖",c1:"#ff9a9e",c2:"#fecfef",size:"1.9 GB",dl:"10M+",age:"13+",
+   desc:"Barbie suffers a crisis that leads her to question her world and her existence. A colourful adventure."},
+  {id:43,name:"Interstellar",dev:"Paramount Pictures",cat:"movies",genre:"Sci-Fi",rating:4.7,icon:"🚀",c1:"#0f0c29",c2:"#302b63",size:"3.1 GB",dl:"50M+",age:"13+",
+   desc:"A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival."},
+  {id:44,name:"The Dark Knight",dev:"Warner Bros.",cat:"movies",genre:"Action",rating:4.8,icon:"🦇",c1:"#1c1c1c",c2:"#4b4b4b",size:"2.6 GB",dl:"50M+",age:"16+",
+   desc:"Batman faces the Joker, a criminal mastermind who plunges Gotham into anarchy."},
+  {id:45,name:"Inception",dev:"Warner Bros.",cat:"movies",genre:"Action",rating:4.7,icon:"🌀",c1:"#2c3e50",c2:"#4ca1af",size:"2.3 GB",dl:"50M+",age:"13+",
+   desc:"A thief who steals corporate secrets through dream-sharing technology is given an inverse task."},
+
+  /* ---------------- BOOKS ---------------- */
+  {id:50,name:"Atomic Habits",dev:"James Clear",cat:"books",genre:"Self-Help",rating:4.8,icon:"⚛️",c1:"#134E5E",c2:"#71B280",size:"4 MB",dl:"10M+",age:"3+",
+   desc:"An easy and proven way to build good habits and break bad ones. Tiny changes, remarkable results."},
+  {id:51,name:"Harry Potter and the Philosopher's Stone",dev:"J.K. Rowling",cat:"books",genre:"Fantasy",rating:4.8,icon:"🪄",c1:"#4b1d3f",c2:"#c31432",size:"6 MB",dl:"50M+",age:"7+",
+   desc:"The first book in the beloved series about a young wizard discovering his magical heritage."},
+  {id:52,name:"The Alchemist",dev:"Paulo Coelho",cat:"books",genre:"Fiction",rating:4.6,icon:"🏜️",c1:"#eacda3",c2:"#d6ae7b",size:"3 MB",dl:"10M+",age:"3+",
+   desc:"A magical fable about following your dreams and listening to your heart."},
+  {id:53,name:"Rich Dad Poor Dad",dev:"Robert T. Kiyosaki",cat:"books",genre:"Business",rating:4.6,icon:"💰",c1:"#f7971e",c2:"#ffd200",size:"4 MB",dl:"10M+",age:"3+",
+   desc:"What the rich teach their kids about money that the poor and middle class do not."},
+  {id:54,name:"Sapiens",dev:"Yuval Noah Harari",cat:"books",genre:"Science",rating:4.7,icon:"🧬",c1:"#136a8a",c2:"#267871",size:"8 MB",dl:"10M+",age:"3+",
+   desc:"A brief history of humankind — from the Stone Age to the Silicon Age."},
+  {id:55,name:"The Psychology of Money",dev:"Morgan Housel",cat:"books",genre:"Business",rating:4.7,icon:"🧠",c1:"#5f2c82",c2:"#49a09d",size:"4 MB",dl:"5M+",age:"3+",
+   desc:"Timeless lessons on wealth, greed and happiness, told through short, engaging stories."},
+
+  /* ---------------- KIDS ---------------- */
+  {id:60,name:"Cocomelon - Nursery Rhymes",dev:"Moonbug Entertainment",cat:"kids",genre:"Videos",rating:4.2,icon:"🍉",c1:"#f857a6",c2:"#ff5858",size:"48 MB",dl:"50M+",age:"3+",
+   desc:"Sing along with JJ and his family! Fun, educational nursery rhymes and songs for toddlers."},
+  {id:61,name:"ABC Kids - Tracing & Phonics",dev:"RV AppStudios",cat:"kids",genre:"Educational",rating:4.3,icon:"🔤",c1:"#43cea2",c2:"#185a9d",size:"62 MB",dl:"50M+",age:"3+",
+   desc:"A fun, free and simple educational app to help toddlers learn phonics and trace letters."},
+  {id:62,name:"Toca Boca World",dev:"Toca Boca",cat:"kids",genre:"Games",rating:4.4,icon:"🏠",c1:"#ff9a9e",c2:"#fad0c4",size:"380 MB",dl:"100M+",age:"3+",
+   desc:"Create your own world, build stories and play with characters in this open-ended sandbox."},
+  {id:63,name:"Pinkfong Baby Shark",dev:"The Pinkfong Company",cat:"kids",genre:"Videos",rating:4.1,icon:"🦈",c1:"#00c6ff",c2:"#0072ff",size:"88 MB",dl:"100M+",age:"3+",
+   desc:"Dance, sing and learn with Baby Shark and friends. Songs, games and stories for kids."},
+  {id:64,name:"KidloLand",dev:"IDZ Digital Private Limited",cat:"kids",genre:"Educational",rating:4.2,icon:"🐣",c1:"#f6d365",c2:"#fda085",size:"210 MB",dl:"10M+",age:"3+",
+   desc:"Nursery rhymes, learning games and activities designed for toddlers and preschoolers."},
+  {id:65,name:"LEGO DUPLO World",dev:"StoryToys",cat:"kids",genre:"Games",rating:4.3,icon:"🧱",c1:"#ff512f",c2:"#f09819",size:"420 MB",dl:"10M+",age:"3+",
+   desc:"Build, play and learn with LEGO DUPLO bricks in a safe world made for young children."}
+];
+
+const GENRE_EMOJI = {
+  Action:"🎯", Puzzle:"🧩", Strategy:"♟️", Casual:"🎈", Adventure:"🗺️", Racing:"🏁", Sports:"⚽",
+  Communication:"💬", Social:"👥", Music:"🎧", Entertainment:"🍿", Tools:"🔧", Travel:"✈️",
+  Education:"🎓", Productivity:"📊", Shopping:"🛍️", "Sci-Fi":"🛸", Drama:"🎭", Comedy:"😂",
+  "Self-Help":"🌱", Fiction:"📖", Business:"💼", Science:"🔬", Fantasy:"🐉", Videos:"📺", Educational:"🧠"
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  section: "games",
+  tab: "foryou",
+  query: "",
+  genre: null,
+  currentApp: null
+};
+const installed = new Set();
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+const STAR = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="flex-shrink:0"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+
+function iconHTML(app, size = 48) {
+  const fs = Math.round(size * 0.52);
+  return `<div class="appicon" style="width:${size}px;height:${size}px;font-size:${fs}px;background:linear-gradient(135deg,${app.c1},${app.c2})">${app.icon}</div>`;
+}
+
+function ratingHTML(app) {
+  return `<span class="rt">${app.rating.toFixed(1)} ${STAR}</span>`;
+}
+
+function byId(id) { return APPS.find(a => a.id === id); }
+
+function sectionApps() {
+  return APPS.filter(a => a.cat === state.section);
+}
+
+function installButtonHTML(app, big = false) {
+  const cls = big ? "biginstall" : "pill";
+  if (installed.has(app.id)) {
+    return `<button class="${cls} done" data-install="${app.id}">Open</button>`;
+  }
+  if (app._busy) {
+    return `<button class="${cls} busy" data-install="${app.id}">Installing
+      <div class="miniprog"><i></i></div>
+    </button>`;
+  }
+  return `<button class="${cls}" data-install="${app.id}">${big ? "Install" : "Install"}</button>`;
+}
+
+function installApp(id) {
+  const app = byId(id);
+  if (!app || installed.has(app.id) || app._busy) return;
+  app._busy = true;
+  render(false);
+  if (state.currentApp && state.currentApp.id === id) openDetail(id, false);
+  setTimeout(() => {
+    app._busy = false;
+    installed.add(id);
+    render(false);
+    if (state.currentApp && state.currentApp.id === id) openDetail(id, false);
+  }, 1650);
+}
+
+/* =========================================================
+   RENDER — MAIN
+   ========================================================= */
+function render(resetScroll = true) {
+  const main = $("#main");
+  const prevScroll = main.scrollTop;
+
+  if (state.query.trim()) {
+    main.innerHTML = viewSearch();
+  } else if (state.genre) {
+    main.innerHTML = viewGenre();
+  } else if (state.tab === "foryou") {
+    main.innerHTML = viewForYou();
+  } else if (state.tab === "top") {
+    main.innerHTML = viewTopCharts();
+  } else if (state.tab === "categories") {
+    main.innerHTML = viewCategories();
+  } else {
+    main.innerHTML = viewNew();
+  }
+
+  main.scrollTop = resetScroll ? 0 : prevScroll;
+}
+
+/* ---------- For you ---------- */
+function viewForYou() {
+  const list = sectionApps();
+  if (!list.length) return emptyState();
+
+  const heroes = [...list].sort((a, b) => b.rating - a.rating).slice(0, 4);
+  const recommended = list.slice(0, 8);
+  const newer = [...list].reverse().slice(0, 6);
+
+  return `
+  <div class="fadein">
+    <div class="hero">
+      ${heroes.map(a => `
+        <div class="hero-card" style="background:linear-gradient(135deg,${a.c1},${a.c2})" data-app="${a.id}">
+          <div class="bigemoji">${a.icon}</div>
+          <div class="hero-badge">FEATURED</div>
+          <div class="hero-title">${a.name}</div>
+          <div class="hero-sub">${a.dev} · ${a.genre}</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="sec-head"><h2>Recommended for you</h2><span class="more">See all</span></div>
+    <div class="hrow">
+      ${recommended.map(a => `
+        <div class="hcard" data-app="${a.id}">
+          ${iconHTML(a, 62)}
+          <div class="nm">${a.name}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR}</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sec-head"><h2>New &amp; updated</h2><span class="more">See all</span></div>
+    ${newer.map(a => `
+      <div class="vrow" data-app="${a.id}">
+        ${iconHTML(a, 56)}
+        <div class="meta">
+          <div class="nm">${a.name}</div>
+          <div class="dv">${a.dev}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR} · ${a.size}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("")}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+/* ---------- Top charts ---------- */
+function viewTopCharts() {
+  const list = [...sectionApps()].sort((a, b) => b.rating - a.rating || b.dl.localeCompare(a.dl));
+  if (!list.length) return emptyState();
+
+  return `
+  <div class="fadein">
+    <div class="sec-head"><h2>Top free ${state.section}</h2><span class="more">See all</span></div>
+    <div class="chips">
+      <button class="chip on">Top free</button>
+      <button class="chip">Top grossing</button>
+      <button class="chip">Trending</button>
+      <button class="chip">New releases</button>
+    </div>
+    ${list.map((a, i) => `
+      <div class="vrow" data-app="${a.id}">
+        <div class="rank">${i + 1}</div>
+        ${iconHTML(a, 56)}
+        <div class="meta">
+          <div class="nm">${a.name}</div>
+          <div class="dv">${a.dev}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR} · ${a.dl}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("")}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+/* ---------- Categories ---------- */
+function viewCategories() {
+  const list = sectionApps();
+  const genres = [...new Set(list.map(a => a.genre))].sort();
+
+  return `
+  <div class="fadein">
+    <div class="sec-head"><h2>Browse ${state.section}</h2></div>
+    <div class="catgrid">
+      ${genres.map(g => `
+        <button class="cattile" data-genre="${g}">
+          <span>${GENRE_EMOJI[g] || "📦"}</span>${g}
+        </button>`).join("")}
+    </div>
+    <div class="divider"></div>
+    <div class="sec-head"><h2>Popular in ${state.section}</h2></div>
+    ${list.slice(0, 6).map(a => `
+      <div class="vrow" data-app="${a.id}">
+        ${iconHTML(a, 52)}
+        <div class="meta">
+          <div class="nm">${a.name}</div>
+          <div class="dv">${a.genre} · ${a.dev}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("")}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+/* ---------- New ---------- */
+function viewNew() {
+  const list = [...sectionApps()].reverse();
+  if (!list.length) return emptyState();
+  return `
+  <div class="fadein">
+    <div class="sec-head"><h2>New &amp; updated ${state.section}</h2></div>
+    <div class="hrow">
+      ${list.slice(0, 8).map(a => `
+        <div class="hcard" data-app="${a.id}">
+          ${iconHTML(a, 62)}
+          <div class="nm">${a.name}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR}</div>
+        </div>`).join("")}
+    </div>
+    <div class="divider"></div>
+    <div class="sec-head"><h2>Fresh releases</h2></div>
+    ${list.map(a => `
+      <div class="vrow" data-app="${a.id}">
+        ${iconHTML(a, 56)}
+        <div class="meta">
+          <div class="nm">${a.name}</div>
+          <div class="dv">${a.dev}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR} · ${a.size}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("")}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+/* ---------- Genre filter view ---------- */
+function viewGenre() {
+  const list = sectionApps().filter(a => a.genre === state.genre);
+  return `
+  <div class="fadein">
+    <div class="backline">
+      <button data-cleargenre>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        ${state.genre}
+      </button>
+    </div>
+    ${list.length ? list.map(a => `
+      <div class="vrow" data-app="${a.id}">
+        ${iconHTML(a, 56)}
+        <div class="meta">
+          <div class="nm">${a.name}</div>
+          <div class="dv">${a.dev}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR} · ${a.dl}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("") : `<div class="empty"><div class="em">🔍</div><p>Nothing here yet</p></div>`}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+/* ---------- Search results ---------- */
+function viewSearch() {
+  const q = state.query.trim().toLowerCase();
+  const results = APPS.filter(a =>
+    a.name.toLowerCase().includes(q) ||
+    a.dev.toLowerCase().includes(q) ||
+    a.genre.toLowerCase().includes(q)
+  );
+
+  if (!results.length) {
+    return `<div class="empty fadein">
+      <div class="em">🔍</div>
+      <p>No results for "<b>${escapeHTML(state.query)}</b>"</p>
+      <p style="font-size:13px">Try a different keyword or check your spelling.</p>
+    </div>`;
+  }
+
+  return `
+  <div class="fadein">
+    <div class="sec-head"><h2>${results.length} result${results.length > 1 ? "s" : ""}</h2></div>
+    ${results.map(a => `
+      <div class="vrow" data-app="${a.id}">
+        ${iconHTML(a, 54)}
+        <div class="meta">
+          <div class="nm">${highlight(a.name, q)}</div>
+          <div class="dv">${a.dev} · ${a.genre}</div>
+          <div class="rt">${a.rating.toFixed(1)} ${STAR} · ${a.dl}</div>
+        </div>
+        ${installButtonHTML(a)}
+      </div>`).join("")}
+    <div style="height:24px"></div>
+  </div>`;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const i = text.toLowerCase().indexOf(q);
+  if (i < 0) return text;
+  return text.slice(0, i) + "<b>" + text.slice(i, i + q.length) + "</b>" + text.slice(i + q.length);
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function emptyState() {
+  return `<div class="empty"><div class="em">📭</div><p>No content in this section</p></div>`;
+}
+
+/* =========================================================
+   DETAIL VIEW
+   ========================================================= */
+function openDetail(id, animate = true) {
+  const app = byId(id);
+  if (!app) return;
+  state.currentApp = app;
+  const d = $("#detail");
+
+  const similar = APPS.filter(a => a.cat === app.cat && a.id !== app.id).slice(0, 8);
+  const shotGradients = [
+    `linear-gradient(160deg,${app.c1},${app.c2})`,
+    `linear-gradient(160deg,${app.c2},${app.c1})`,
+    `linear-gradient(160deg,${app.c1}cc,${app.c2}99)`,
+    `linear-gradient(160deg,${app.c2}dd,${app.c1}bb)`
+  ];
+  const shotEmojis = ["🎮", "🏆", "⭐", "🎯"];
+
+  d.innerHTML = `
+    <div class="dbar">
+      <button class="iconbtn" id="backBtn" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div style="display:flex;gap:2px">
+        <button class="iconbtn" aria-label="Share">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 1 0-3-3c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65a2.92 2.92 0 1 0 2.92-2.92z"/></svg>
+        </button>
+        <button class="iconbtn" aria-label="More">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="dscroll">
+      <div class="dhead">
+        ${iconHTML(app, 82)}
+        <div style="min-width:0">
+          <h1>${app.name}</h1>
+          <div class="dv">${app.dev}</div>
+          <div class="sub">${app.genre} · In-app purchases</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b>${app.rating.toFixed(1)} ${STAR}</b><span>${(Math.random() * 8 + 1).toFixed(1)}M reviews</span></div>
+        <div class="vline"></div>
+        <div class="stat"><b>${app.dl}</b><span>Downloads</span></div>
+        <div class="vline"></div>
+        <div class="stat"><b>${app.age}</b><span>Rated for</span></div>
+        <div class="vline"></div>
+        <div class="stat"><b>${app.size}</b><span>Size</span></div>
+      </div>
+
+      <div class="installwrap">
+        ${installButtonHTML(app, true)}
+      </div>
+
+      <div class="shots">
+        ${shotGradients.map((g, i) => `
+          <div class="shot" style="background:${g}">${shotEmojis[i]}</div>`).join("")}
+      </div>
+
+      <div class="block">
+        <h3>About this app <span class="arw">›</span></h3>
+        <p>${app.desc}</p>
+        <div class="tags">
+          <span class="tag">${app.genre}</span>
+          <span class="tag">${app.age}</span>
+          <span class="tag">${app.dl} downloads</span>
+        </div>
+      </div>
+
+      <div style="height:24px"></div>
+
+      <div class="block" style="padding-bottom:14px">
+        <h3>Similar ${app.cat} <span class="arw">›</span></h3>
+      </div>
+      <div class="similar">
+        ${similar.map(s => `
+          <div class="scard" data-app="${s.id}">
+            ${iconHTML(s, 60)}
+            <div class="nm">${s.name}</div>
+            <div class="rt" style="font-size:11px;color:var(--sub);display:flex;gap:3px;align-items:center">${s.rating.toFixed(1)} ${STAR}</div>
+          </div>`).join("")}
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  `;
+
+  if (animate) {
+    requestAnimationFrame(() => d.classList.add("open"));
+  } else {
+    d.classList.add("open");
+  }
+  d.querySelector(".dscroll").scrollTop = 0;
+}
+
+function closeDetail() {
+  $("#detail").classList.remove("open");
+  state.currentApp = null;
+}
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+// Global click delegation
+document.addEventListener("click", (e) => {
+  // Install buttons (anywhere)
+  const inst = e.target.closest("[data-install]");
+  if (inst) {
+    e.stopPropagation();
+    e.preventDefault();
+    installApp(Number(inst.dataset.install));
+    return;
+  }
+
+  // Category tile
+  const tile = e.target.closest("[data-genre]");
+  if (tile) {
+    state.genre = tile.dataset.genre;
+    state.query = "";
+    $("#searchInput").value = "";
+    render();
+    return;
+  }
+
+  // Clear genre
+  if (e.target.closest("[data-cleargenre]")) {
+    state.genre = null;
+    render();
+    return;
+  }
+
+  // App card / row
+  const appEl = e.target.closest("[data-app]");
+  if (appEl) {
+    openDetail(Number(appEl.dataset.app));
+    return;
+  }
+
+  // Back button in detail
+  if (e.target.closest("#backBtn")) {
+    closeDetail();
+    return;
+  }
+});
+
+// Tabs
+$("#tabs").addEventListener("click", (e) => {
+  const t = e.target.closest(".tab");
+  if (!t) return;
+  $$(".tab").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  state.tab = t.dataset.tab;
+  state.genre = null;
+  state.query = "";
+  $("#searchInput").value = "";
+  render();
+});
+
+// Bottom nav
+$("#bottomnav").addEventListener("click", (e) => {
+  const n = e.target.closest(".navitem");
+  if (!n) return;
+  $$(".navitem").forEach(x => x.classList.remove("active"));
+  n.classList.add("active");
+  state.section = n.dataset.section;
+  state.genre = null;
+  state.query = "";
+  $("#searchInput").value = "";
+  render();
+});
+
+// Search input
+let searchTimer;
+$("#searchInput").addEventListener("input", (e) => {
+  clearTimeout(searchTimer);
+  const val = e.target.value;
+  searchTimer = setTimeout(() => {
+    state.query = val;
+    if (val.trim()) state.genre = null;
+    render();
+  }, 160);
+});
+
+// Escape closes detail / clears search
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (state.currentApp) closeDetail();
+    else if (state.query) {
+      state.query = "";
+      $("#searchInput").value = "";
+      render();
+    }
+  }
+});
+
+// Swipe-back gesture on detail
+(function swipeBack() {
+  const d = $("#detail");
+  let startX = 0, startY = 0, tracking = false;
+  d.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = startX < 60;
+  }, { passive: true });
+  d.addEventListener("touchmove", (e) => {
+    if (!tracking) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dx > 90 && dy < 60) {
+      tracking = false;
+      closeDetail();
+    }
+  }, { passive: true });
+  d.addEventListener("touchend", () => { tracking = false; }, { passive: true });
+})();
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+render();
+</script>
+</body>
+</html>

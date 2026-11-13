@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>WhatsApp Web</title>
+<style>
+/* ============ THEME ============ */
+:root{
+  --app-bg:#d9dbd5;
+  --panel:#ffffff;
+  --panel-2:#f0f2f5;
+  --border:#e9edef;
+  --text:#111b21;
+  --text-2:#667781;
+  --accent:#00a884;
+  --accent-2:#008069;
+  --bubble-out:#d9fdd3;
+  --bubble-in:#ffffff;
+  --hover:#f5f6f6;
+  --active:#f0f2f5;
+  --chat-bg:#efeae2;
+  --tick:#667781;
+  --tick-read:#53bdeb;
+  --shadow:0 1px .5px rgba(11,20,26,.13);
+  --pattern:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23000' stroke-opacity='.045' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='20' cy='18' r='7'/%3E%3Cpath d='M70 14h14M77 7v14'/%3E%3Cpath d='M14 66q8-12 16 0'/%3E%3Crect x='74' y='64' width='16' height='16' rx='4'/%3E%3Cpath d='M38 96h16M46 88v16'/%3E%3Ccircle cx='104' cy='104' r='6'/%3E%3Cpath d='M100 38l8 8-8 8'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-theme="dark"]{
+  --app-bg:#0b141a;
+  --panel:#111b21;
+  --panel-2:#202c33;
+  --border:#222d34;
+  --text:#e9edef;
+  --text-2:#8696a0;
+  --accent:#00a884;
+  --accent-2:#00a884;
+  --bubble-out:#005c4b;
+  --bubble-in:#202c33;
+  --hover:#202c33;
+  --active:#2a3942;
+  --chat-bg:#0b141a;
+  --tick:#8696a0;
+  --tick-read:#53bdeb;
+  --shadow:0 1px .5px rgba(0,0,0,.35);
+  --pattern:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.028' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='20' cy='18' r='7'/%3E%3Cpath d='M70 14h14M77 7v14'/%3E%3Cpath d='M14 66q8-12 16 0'/%3E%3Crect x='74' y='64' width='16' height='16' rx='4'/%3E%3Cpath d='M38 96h16M46 88v16'/%3E%3Ccircle cx='104' cy='104' r='6'/%3E%3Cpath d='M100 38l8 8-8 8'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ============ BASE ============ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--app-bg);
+  color:var(--text);
+  height:100dvh;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;
+}
+button{font-family:inherit}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:rgba(134,150,160,.4);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ LAYOUT ============ */
+.app{
+  display:flex;
+  height:100dvh;
+  max-width:1600px;
+  margin:0 auto;
+  background:var(--panel);
+  box-shadow:0 0 24px rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.sidebar{
+  width:380px;
+  flex:0 0 380px;
+  display:flex;
+  flex-direction:column;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  min-width:0;
+}
+.chat{
+  flex:1;
+  display:flex;
+  min-width:0;
+  background:var(--panel-2);
+}
+
+/* ============ ICON BUTTONS ============ */
+.icon-btn{
+  width:40px;height:40px;
+  border:none;background:none;
+  border-radius:50%;
+  display:grid;place-items:center;
+  color:var(--text-2);
+  cursor:pointer;
+  flex-shrink:0;
+  transition:background .15s,color .15s;
+}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+.icon-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn.fill svg{fill:currentColor;stroke:none}
+
+/* ============ AVATARS ============ */
+.avatar{
+  width:49px;height:49px;
+  border-radius:50%;
+  background:var(--c,#7c5cff);
+  display:grid;place-items:center;
+  color:#fff;
+  font-size:17px;
+  font-weight:500;
+  letter-spacing:.5px;
+  position:relative;
+  flex-shrink:0;
+  user-select:none;
+}
+.avatar.sm{width:40px;height:40px;font-size:14px}
+.presence{
+  position:absolute;right:0;bottom:0;
+  width:12px;height:12px;border-radius:50%;
+  background:#25d366;
+  border:2px solid var(--panel);
+  display:none;
+}
+.avatar.online .presence{display:block}
+
+/* ============ SIDEBAR HEADER ============ */
+.side-head{
+  height:60px;
+  flex-shrink:0;
+  background:var(--panel-2);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px 0 16px;
+  gap:8px;
+}
+.side-actions{display:flex;gap:2px;align-items:center}
+
+/* ============ SEARCH ============ */
+.search-wrap{
+  padding:7px 12px;
+  background:var(--panel);
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--panel-2);
+  border-radius:8px;
+  padding:0 12px;
+  height:38px;
+}
+.search-box svg{width:18px;height:18px;fill:none;stroke:var(--text-2);stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.search-box input{
+  border:none;background:none;outline:none;
+  color:var(--text);font-size:14.5px;
+  width:100%;height:100%;
+}
+.search-box input::placeholder{color:var(--text-2)}
+
+/* ============ CHAT LIST ============ */
+.chat-list{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background:var(--panel);
+}
+.chat-item{
+  display:flex;
+  gap:13px;
+  padding:10px 16px;
+  cursor:pointer;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+  transition:background .12s;
+  user-select:none;
+}
+.chat-item:hover{background:var(--hover)}
+.chat-item.active{background:var(--active)}
+.ci-body{flex:1;min-width:0}
+.ci-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ci-name{
+  font-size:16.5px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ci-time{font-size:12px;color:var(--text-2);flex-shrink:0}
+.chat-item.active .ci-time,
+.ci-time.unread{color:var(--accent)}
+.ci-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:3px}
+.ci-preview{
+  font-size:13.5px;color:var(--text-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:4px;
+}
+.ci-preview .tick-mini{color:var(--tick)}
+.ci-preview .tick-mini.read{color:var(--tick-read)}
+.badge{
+  background:var(--accent);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  min-width:20px;height:20px;
+  border-radius:10px;
+  display:grid;place-items:center;
+  padding:0 6px;
+  flex-shrink:0;
+}
+.no-chats{padding:40px 20px;text-align:center;color:var(--text-2);font-size:14px}
+
+/* ============ EMPTY STATE ============ */
+.chat-empty{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+  background:var(--panel-2);
+  border-bottom:6px solid var(--accent);
+}
+.empty-inner{max-width:520px}
+.empty-logo{width:120px;height:120px;fill:none;stroke:var(--text-2);stroke-width:1.5;opacity:.35;margin-bottom:18px}
+.chat-empty h1{
+  font-size:32px;font-weight:300;
+  color:var(--text);margin:0 0 14px;
+}
+.chat-empty p{color:var(--text-2);font-size:14px;line-height:1.9;margin:0 0 40px}
+.empty-lock{color:var(--text-2);font-size:13px;border-top:1px solid var(--border);padding-top:22px}
+.empty-lock span{color:var(--text-2)}
+
+/* ============ CHAT PANEL ============ */
+.chat-main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  position:relative;
+  height:100%;
+}
+.chat-head{
+  height:60px;
+  flex-shrink:0;
+  background:var(--panel-2);
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:0 16px;
+  border-bottom:1px solid var(--border);
+  z-index:3;
+}
+.back-btn{display:none;margin-left:-8px}
+.ch-info{flex:1;min-width:0;line-height:1.35}
+.ch-name{
+  font-size:16px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ch-status{
+  font-size:13px;color:var(--text-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ch-status.typing{color:var(--accent)}
+.ch-actions{display:flex;gap:2px;align-items:center}
+
+/* ============ MESSAGES ============ */
+.messages{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:14px 6% 12px;
+  background-color:var(--chat-bg);
+  background-image:var(--pattern);
+  background-size:320px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  scroll-behavior:smooth;
+}
+.divider{
+  display:flex;
+  justify-content:center;
+  margin:14px 0 10px;
+}
+.divider span{
+  background:var(--panel-2);
+  color:var(--text-2);
+  font-size:12.5px;
+  padding:5px 12px;
+  border-radius:7px;
+  box-shadow:var(--shadow);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.msg{display:flex;margin-bottom:2px;padding:0 2px}
+.msg.out{justify-content:flex-end}
+.bubble{
+  position:relative;
+  max-width:min(65%,560px);
+  background:var(--bubble-in);
+  border-radius:8px;
+  padding:6px 9px 8px 9px;
+  box-shadow:var(--shadow);
+  font-size:14.5px;
+  line-height:1.45;
+  word-wrap:break-word;
+  animation:pop .16s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.msg.out .bubble{background:var(--bubble-out)}
+.bubble .text{
+  display:block;
+  white-space:pre-wrap;
+  word-break:break-word;
+  padding-right:60px;
+}
+.bubble .sender{
+  font-size:13.5px;
+  font-weight:600;
+  margin-bottom:2px;
+  display:block;
+}
+.meta{
+  position:absolute;
+  right:9px;
+  bottom:5px;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  font-size:11px;
+  color:var(--text-2);
+  user-select:none;
+}
+.meta .ticks{display:inline-flex;color:var(--tick)}
+.meta .ticks.read{color:var(--tick-read)}
+.meta svg{width:16px;height:11px;display:block}
+
+/* typing bubble */
+.bubble.typing{
+  display:flex;
+  gap:4px;
+  align-items:center;
+  padding:12px 14px;
+  min-width:56px;
+}
+.bubble.typing span{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--text-2);
+  animation:blink 1.3s infinite ease-in-out;
+}
+.bubble.typing span:nth-child(2){animation-delay:.18s}
+.bubble.typing span:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+/* ============ COMPOSER ============ */
+.composer{
+  flex-shrink:0;
+  background:var(--panel-2);
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  padding:8px 14px;
+  min-height:62px;
+  z-index:2;
+}
+.input-wrap{
+  flex:1;
+  background:var(--panel);
+  border-radius:9px;
+  padding:9px 14px;
+  min-width:0;
+  display:flex;
+  align-items:center;
+}
+.input-wrap textarea{
+  width:100%;
+  border:none;
+  outline:none;
+  background:none;
+  resize:none;
+  color:var(--text);
+  font-family:inherit;
+  font-size:15px;
+  line-height:1.4;
+  max-height:120px;
+  overflow-y:auto;
+  padding:0;
+}
+.input-wrap textarea::placeholder{color:var(--text-2)}
+.send-btn{color:var(--accent-2)}
+[data-theme="dark"] .send-btn{color:var(--accent)}
+
+/* ============ EMOJI PICKER ============ */
+.emoji-picker{
+  position:absolute;
+  bottom:70px;
+  left:14px;
+  width:330px;
+  max-width:calc(100% - 28px);
+  max-height:270px;
+  overflow-y:auto;
+  background:var(--panel);
+  border-radius:12px;
+  box-shadow:0 6px 26px rgba(0,0,0,.24);
+  padding:10px;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:2px;
+  z-index:5;
+  border:1px solid var(--border);
+}
+.emoji-picker button{
+  background:none;border:none;
+  font-size:21px;
+  cursor:pointer;
+  border-radius:7px;
+  padding:3px 0;
+  line-height:1.2;
+  transition:background .1s,transform .1s;
+}
+.emoji-picker button:hover{background:var(--hover);transform:scale(1.18)}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:34px;
+  transform:translate(-50%,20px);
+  background:var(--panel-2);
+  color:var(--text);
+  padding:11px 20px;
+  border-radius:8px;
+  font-size:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.25);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s,transform .25s;
+  z-index:99;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:820px){
+  .app{max-width:none;box-shadow:none}
+  .sidebar{width:100%;flex:1;border-right:none}
+  .chat{display:none}
+  body.chat-open .sidebar{display:none}
+  body.chat-open .chat{display:flex}
+  .back-btn{display:grid}
+  .chat-empty{display:none}
+  .bubble{max-width:82%}
+  .messages{padding:12px 10px}
+  .emoji-picker{left:8px;width:calc(100% - 16px)}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <header class="side-head">
+      <div class="avatar sm" id="meAvatar" style="--c:#00a884"><span class="ini">Y</span></div>
+      <div class="side-actions">
+        <button class="icon-btn" id="newChatBtn" title="New chat" aria-label="New chat">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/><path d="M9 11.5h6M12 8.5v6"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <button class="icon-btn" title="Menu" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.5 16.5"/></svg>
+        <input id="searchInput" type="text" placeholder="Search or start new chat" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <div class="chat-list" id="chatList"></div>
+  </aside>
+
+  <!-- ================= CHAT ================= -->
+  <main class="chat">
+
+    <!-- Empty state -->
+    <div class="chat-empty" id="chatEmpty">
+      <div class="empty-inner">
+        <svg class="empty-logo" viewBox="0 0 24 24">
+          <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>
+        </svg>
+        <h1>WhatsApp Web</h1>
+        <p>Send and receive messages without keeping your phone online.<br>
+           Use WhatsApp on up to 4 linked devices and 1 phone at the same time.</p>
+        <div class="empty-lock">🔒 End-to-end encrypted</div>
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    <div class="chat-main" id="chatMain" hidden>
+      <header class="chat-head">
+        <button class="icon-btn back-btn" id="backBtn" aria-label="Back">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="avatar sm" id="chAvatar" style="--c:#7c5cff">
+          <span class="ini">AS</span><span class="presence"></span>
+        </div>
+        <div class="ch-info">
+          <div class="ch-name" id="chName">—</div>
+          <div class="ch-status" id="chStatus">online</div>
+        </div>
+        <div class="ch-actions">
+          <button class="icon-btn" id="videoBtn" title="Video call" aria-label="Video call">
+            <svg viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10.6 22 7v10l-7-3.6z"/></svg>
+          </button>
+          <button class="icon-btn" id="callBtn" title="Voice call" aria-label="Voice call">
+            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg>
+          </button>
+          <button class="icon-btn" id="searchChatBtn" title="Search" aria-label="Search in chat">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.5 16.5"/></svg>
+          </button>
+          <button class="icon-btn" title="Menu" aria-label="Chat menu">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="messages" id="messages"></div>
+
+      <footer class="composer">
+        <button class="icon-btn" id="emojiBtn" title="Emoji" aria-label="Emoji">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.6 4.6 0 0 0 7 0"/><circle cx="9" cy="9.6" r=".9" fill="currentColor" stroke="none"/><circle cx="15" cy="9.6" r=".9" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <button class="icon-btn" id="attachBtn" title="Attach" aria-label="Attach">
+          <svg viewBox="0 0 24 24"><path d="M21.4 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <div class="input-wrap">
+          <textarea id="msgInput" rows="1" placeholder="Type a message" autocomplete="off"></textarea>
+        </div>
+        <button class="icon-btn send-btn fill" id="sendBtn" title="Send" aria-label="Send" hidden>
+          <svg viewBox="0 0 24 24"><path d="M2.5 21 22 12 2.5 3l4.2 9-4.2 9z"/></svg>
+        </button>
+        <button class="icon-btn" id="micBtn" title="Voice message" aria-label="Voice message">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/></svg>
+        </button>
+      </footer>
+
+      <div class="emoji-picker" id="emojiPicker" hidden></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* =========================================================
+   CONSTANTS & HELPERS
+   ========================================================= */
+const STORE_KEY = "wa-clone-v1";
+const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+
+const $  = (s, r = document) => r.querySelector(s);
+const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
+
+let _uid = 0;
+const uid = () => "m" + (++_uid) + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+const esc = s => String(s).replace(/[&<>"']/g, c => (
+  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+));
+
+const pad2 = n => String(n).padStart(2, "0");
+const fmtTime = ts => { const d = new Date(ts); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); };
+const dayKey  = ts => { const d = new Date(ts); return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); };
+
+function isToday(ts) {
+  const d = new Date(ts), n = new Date();
+  return d.getDate() === n.getDate() && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+}
+function isYesterday(ts) {
+  const d = new Date(ts), y = new Date(Date.now() - DAY);
+  return d.getDate() === y.getDate() && d.getMonth() === y.getMonth() && d.getFullYear() === y.getFullYear();
+}
+function dayLabel(ts) {
+  if (isToday(ts)) return "Today";
+  if (isYesterday(ts)) return "Yesterday";
+  const d = new Date(ts);
+  return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear();
+}
+function listTime(ts) {
+  if (isToday(ts)) return fmtTime(ts);
+  if (isYesterday(ts)) return "Yesterday";
+  const d = new Date(ts);
+  return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear();
+}
+const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+
+const SENDER_COLORS = ["#e542a3", "#7d9c1f", "#dfa63a", "#53bdeb", "#a06bd4", "#e57373", "#00a884", "#c47d3a"];
+const senderColor = name => {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return SENDER_COLORS[h % SENDER_COLORS.length];
+};
+
+/* =========================================================
+   SEED DATA
+   ========================================================= */
+function seedData() {
+  const now = Date.now();
+  return [
+    {
+      id: "c1", name: "Aarav Sharma", color: "#7c5cff", online: true, unread: 0,
+      about: "Available",
+      replies: ["Haha true 😄", "Sounds good!", "Let me check and get back to you.", "On my way 🚀", "Perfect 👌", "Wait, what? 😅", "Alright, noted."],
+      messages: [
+        { text: "Hey! Are we still on for tomorrow?",       out: false, ts: now - 5 * HOUR },
+        { text: "Yes — 10am at the usual place?",           out: true,  ts: now - 4.9 * HOUR, status: "read" },
+        { text: "Works for me. I'll bring the laptop.",     out: false, ts: now - 4.8 * HOUR },
+        { text: "Sure, see you then 👍",                    out: true,  ts: now - 4.7 * HOUR, status: "read" }
+      ]
+    },
+    {
+      id: "c2", name: "Priya Nair", color: "#e542a3", online: false, unread: 2,
+      about: "Busy",
+      replies: ["Got it, thanks!", "I'll send it over in a bit 📎", "Can we do 4pm instead?", "That works for me 👍", "Hmm, let me think about it."],
+      messages: [
+        { text: "Morning! Did you get a chance to look at the deck?", out: false, ts: now - 26 * HOUR },
+        { text: "Just opened it. Looks solid overall.",               out: true,  ts: now - 25.5 * HOUR, status: "read" },
+        { text: "Sending the files now",                              out: false, ts: now - 40 * MIN },
+        { text: "Also, can we push the review to 4pm?",               out: false, ts: now - 38 * MIN }
+      ]
+    },
+    {
+      id: "c3", name: "Design Squad", color: "#0088cc", online: false, unread: 0, group: true,
+      members: ["Riya", "Kabir", "Meera"],
+      about: "Group · 12 members",
+      replies: ["Looks great 🔥", "Let's discuss this in the standup.", "I'll take a look tonight.", "Agreed 👍", "Nice work team!"],
+      messages: [
+        { text: "the new mockups look 🔥",                 out: false, ts: now - 2 * HOUR,      sender: "Riya" },
+        { text: "agreed, way cleaner than v2",             out: false, ts: now - 1.9 * HOUR,    sender: "Kabir" },
+        { text: "Thanks both 🙏 I'll polish the empty states today.", out: true, ts: now - 1.8 * HOUR, status: "read" },
+        { text: "perfect, ping me when it's up",           out: false, ts: now - 1.7 * HOUR,    sender: "Riya" }
+      ]
+    },
+    {
+      id: "c4", name: "Mom", color: "#e58c3a", online: true, unread: 0,
+      about: "Available",
+      replies: ["Ok beta ❤️", "Did you eat?", "Call me when you're free.", "Take care of your health 🙏"],
+      messages: [
+        { text: "Did you eat?",                     out: false, ts: now - 60 * MIN },
+        { text: "Yes maa, just had lunch 😊",       out: true,  ts: now - 55 * MIN, status: "read" },
+        { text: "Good. Call me tonight.",           out: false, ts: now - 50 * MIN }
+      ]
+    },
+    {
+      id: "c5", name: "Rohan Verma", color: "#3aa76d", online: false, unread: 1,
+      about: "Last seen today at 09:41",
+      replies: ["Bro 😂", "Count me in!", "I'll book the table then.", "Let's gooo 🔥", "Tomorrow 7pm?"],
+      messages: [
+        { text: "Bro the match last night was insane 🤯",  out: false, ts: now - 9 * HOUR },
+        { text: "I know right! That last over 😭",         out: true,  ts: now - 8.8 * HOUR, status: "read" },
+        { text: "Let's go watch the next one at the cafe", out: false, ts: now - 3 * HOUR }
+      ]
+    },
+    {
+      id: "c6", name: "Ananya Iyer", color: "#9b6bdf", online: false, unread: 0,
+      about: "Last seen yesterday at 18:22",
+      replies: ["Received, thanks!", "Will revert by EOD.", "Can you share the source file?", "Noted 👍"],
+      messages: [
+        { text: "Hi Ananya, sending over the Q3 numbers now.", out: true,  ts: now - 2 * DAY,            status: "read" },
+        { text: "Received, thanks! Will review and revert.",   out: false, ts: now - 2 * DAY + 20 * MIN }
+      ]
+    }
+  ].map(c => ({ ...c, messages: c.messages.map(m => ({ id: uid(), ...m })) }));
+}
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  theme: "light",
+  activeId: null,
+  query: "",
+  chats: []
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.chats) || !data.chats.length) return false;
+    state.chats = data.chats.map(c => ({ ...c, typing: false, replyTimer: null }));
+    state.theme = data.theme === "dark" ? "dark" : "light";
+    return true;
+  } catch (e) { return false; }
+}
+
+function save() {
+  try {
+    const payload = {
+      theme: state.theme,
+      chats: state.chats.map(c => {
+        const { typing, replyTimer, ...rest } = c;
+        return rest;
+      })
+    };
+    localStorage.setItem(STORE_KEY, JSON.stringify(payload));
+  } catch (e) { /* storage may be full / disabled */ }
+}
+
+const getChat = id => state.chats.find(c => c.id === id);
+const getActive = () => getChat(state.activeId);
+const lastTs = c => c.messages.length ? c.messages[c.messages.length - 1].ts : 0;
+
+/* =========================================================
+   SVG FRAGMENTS
+   ========================================================= */
+const TICK_SINGLE =
+  '<svg viewBox="0 0 16 11"><path d="M1.6 6.1 5.2 9.4 12.6 1.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TICK_DOUBLE =
+  '<svg viewBox="0 0 18 11"><path d="M1.2 6.1 4.8 9.4 11.6 1.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.6 6.1 10.2 9.4 17 1.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function tickSVG(status) {
+  if (status === "sent") return TICK_SINGLE;
+  return TICK_DOUBLE; // delivered + read (colour handled by class)
+}
+
+/* =========================================================
+   RENDER: CHAT LIST
+   ========================================================= */
+function renderChatList() {
+  const box = $("#chatList");
+  const q = state.query.trim().toLowerCase();
+
+  let list = state.chats.filter(c => {
+    if (!q) return true;
+    if (c.name.toLowerCase().includes(q)) return true;
+    return c.messages.some(m => m.text.toLowerCase().includes(q));
+  });
+
+  list = list.slice().sort((a, b) => lastTs(b) - lastTs(a));
+
+  if (!list.length) {
+    box.innerHTML = '<div class="no-chats">No chats found</div>';
+    return;
+  }
+
+  box.innerHTML = list.map(c => {
+    const last = c.messages[c.messages.length - 1];
+    const active = c.id === state.activeId;
+
+    let preview = "";
+    if (last) {
+      const prefix = last.out
+        ? `<span class="tick-mini ${last.status === "read" ? "read" : ""}">${tickSVG(last.status)}</span>`
+        : "";
+      const who = (!last.out && c.group && last.sender) ? `<b>${esc(last.sender)}:</b> ` : "";
+      preview = prefix + who + esc(last.text);
+    }
+
+    return `
+      <div class="chat-item ${active ? "active" : ""}" data-id="${c.id}" role="button" tabindex="0">
+        <div class="avatar ${c.online ? "online" : ""}" style="--c:${c.color}">
+          <span class="ini">${esc(initials(c.name))}</span>
+          <span class="presence"></span>
+        </div>
+        <div class="ci-body">
+          <div class="ci-top">
+            <span class="ci-name">${esc(c.name)}</span>
+            <span class="ci-time ${c.unread ? "unread" : ""}">${last ? listTime(last.ts) : ""}</span>
+          </div>
+          <div class="ci-bottom">
+            <span class="ci-preview">${preview}</span>
+            ${c.unread ? `<span class="badge">${c.unread}</span>` : ""}
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* =========================================================
+   RENDER: CHAT HEADER
+   ========================================================= */
+function renderChatHeader() {
+  const c = getActive();
+  if (!c) return;
+
+  const av = $("#chAvatar");
+  av.style.setProperty("--c", c.color);
+  $(".ini", av).textContent = initials(c.name);
+  av.classList.toggle("online", !!c.online);
+
+  $("#chName").textContent = c.name;
+
+  const st = $("#chStatus");
+  if (c.typing) {
+    st.textContent = "typing…";
+    st.classList.add("typing");
+  } else {
+    st.classList.remove("typing");
+    st.textContent = c.online ? "online" : (c.about || "last seen recently");
+  }
+}
+
+/* =========================================================
+   RENDER: MESSAGES
+   ========================================================= */
+function bubbleHTML(m, chat) {
+  const sender = (!m.out && m.sender)
+    ? `<span class="sender" style="color:${senderColor(m.sender)}">${esc(m.sender)}</span>`
+    : "";
+
+  const ticks = m.out
+    ? `<span class="ticks ${m.status === "read" ? "read" : ""}">${tickSVG(m.status)}</span>`
+    : "";
+
+  return `
+    <div class="msg ${m.out ? "out" : "in"}">
+      <div class="bubble">
+        ${sender}
+        <span class="text">${esc(m.text)}</span>
+        <span class="meta"><span class="time">${fmtTime(m.ts)}</span>${ticks}</span>
+      </div>
+    </div>`;
+}
+
+function renderMessages() {
+  const box = $("#messages");
+  const chat = getActive();
+  if (!chat) { box.innerHTML = ""; return; }
+
+  let html = "";
+  let lastDay = null;
+
+  for (const m of chat.messages) {
+    const dk = dayKey(m.ts);
+    if (dk !== lastDay) {
+      html += `<div class="divider"><span>${dayLabel(m.ts)}</span></div>`;
+      lastDay = dk;
+    }
+    html += bubbleHTML(m, chat);
+  }
+
+  if (chat.typing) {
+    html += `<div class="msg in"><div class="bubble typing"><span></span><span></span><span></span></div></div>`;
+  }
+
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+
+/* =========================================================
+   OPEN CHAT
+   ========================================================= */
+function openChat(id) {
+  const chat = getChat(id);
+  if (!chat) return;
+
+  state.activeId = id;
+  chat.unread = 0;
+
+  document.body.classList.add("chat-open");
+  $("#chatEmpty").hidden = true;
+  $("#chatMain").hidden = false;
+
+  renderChatList();
+  renderChatHeader();
+  renderMessages();
+  save();
+
+  updateComposer();
+  if (window.innerWidth > 820) setTimeout(() => $("#msgInput").focus(), 40);
+}
+
+function closeChat() {
+  document.body.classList.remove("chat-open");
+}
+
+/* =========================================================
+   SENDING MESSAGES
+   ========================================================= */
+function pushMessage(chat, msg) {
+  chat.messages.push({ id: uid(), ts: Date.now(), ...msg });
+}
+
+function sendMessage() {
+  const input = $("#msgInput");
+  const text = input.value.trim();
+  const chat = getActive();
+  if (!text || !chat) return;
+
+  pushMessage(chat, { text, out: true, status: "sent" });
+  const sent = chat.messages[chat.messages.length - 1];
+
+  input.value = "";
+  autoGrow();
+  updateComposer();
+
+  renderMessages();
+  renderChatList();
+  save();
+
+  // Simulated delivery receipts
+  setTimeout(() => {
+    if (sent.status === "sent") { sent.status = "delivered"; refreshIfActive(chat.id); }
+  }, 650);
+  setTimeout(() => {
+    if (sent.status !== "read") { sent.status = "read"; refreshIfActive(chat.id); }
+  }, 1900);
+
+  scheduleReply(chat);
+}
+
+function refreshIfActive(id) {
+  if (state.activeId === id) renderMessages();
+  renderChatList();
+  save();
+}
+
+/* =========================================================
+   SIMULATED REPLIES
+   ========================================================= */
+function pickReply(chat) {
+  const pool = chat.replies && chat.replies.length
+    ? chat.replies
+    : ["Got it 👍", "Sure!", "Okay", "Thanks for the update.", "Makes sense."];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function scheduleReply(chat) {
+  if (chat.replyTimer) clearTimeout(chat.replyTimer);
+  if (chat.typingTimers) chat.typingTimers.forEach(clearTimeout);
+  chat.typingTimers = [];
+
+  const startTyping = 700 + Math.random() * 900;
+  const typingDur   = 1000 + Math.random() * 1600;
+
+  chat.replyTimer = setTimeout(() => {
+    chat.typing = true;
+    if (state.activeId === chat.id) { renderChatHeader(); renderMessages(); }
+    renderChatList();
+
+    chat.replyTimer = setTimeout(() => {
+      chat.typing = false;
+      const sender = chat.group && chat.members
+        ? chat.members[Math.floor(Math.random() * chat.members.length)]
+        : undefined;
+
+      pushMessage(chat, { text: pickReply(chat), out: false, sender });
+
+      if (state.activeId === chat.id) {
+        renderMessages();
+        renderChatHeader();
+      } else {
+        chat.unread = (chat.unread || 0) + 1;
+      }
+      renderChatList();
+      save();
+    }, typingDur);
+  }, startTyping);
+}
+
+/* =========================================================
+   COMPOSER
+   ========================================================= */
+const input    = $("#msgInput");
+const sendBtn  = $("#sendBtn");
+const micBtn   = $("#micBtn");
+
+function autoGrow() {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 120) + "px";
+}
+
+function updateComposer() {
+  const has = input.value.trim().length > 0;
+  sendBtn.hidden = !has;
+  micBtn.hidden = has;
+}
+
+/* =========================================================
+   EMOJI PICKER
+   ========================================================= */
+const EMOJIS = [
+  "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰",
+  "😘","😗","😙","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥳","😏","😒","😞",
+  "😔","😟","😕","🙁","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤯","😳",
+  "🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","😶","😐","😑","😬","🙄",
+  "😯","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕",
+  "🤑","🤠","😈","🤡","💩","👻","💀","👽","🤖","😺","😸","😹","😻","🙀","👍","👎",
+  "👌","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","✋","🤚","👋","🤝","🙏",
+  "💪","✍️","💅","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💔","❣️","💕","💞","💓",
+  "💗","💖","💘","💝","💯","💢","💥","💫","💦","💨","💬","💭","💤","🎉","🎊","🔥",
+  "⭐","🌟","✨","⚡","☀️","🌙","🌈","☕","🍕","🍔","🍟","🍰","🎂","🍫","🍿","🥤"
+];
+
+function buildEmojiPicker() {
+  const p = $("#emojiPicker");
+  p.innerHTML = EMOJIS.map(e => `<button type="button" tabindex="-1">${e}</button>`).join("");
+}
+
+function insertAtCursor(text) {
+  const start = input.selectionStart ?? input.value.length;
+  const end   = input.selectionEnd ?? input.value.length;
+  input.value = input.value.slice(0, start) + text + input.value.slice(end);
+  input.selectionStart = input.selectionEnd = start + text.length;
+  input.focus();
+  autoGrow();
+  updateComposer();
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1900);
+}
+
+/* =========================================================
+   THEME
+   ========================================================= */
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", state.theme);
+  const btn = $("#themeBtn");
+  btn.innerHTML = state.theme === "dark"
+    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+}
+
+/* =========================================================
+   EVENT WIRING
+   ========================================================= */
+function wireEvents() {
+
+  // Chat list (delegated)
+  $("#chatList").addEventListener("click", e => {
+    const item = e.target.closest(".chat-item");
+    if (item) openChat(item.dataset.id);
+  });
+  $("#chatList").addEventListener("keydown", e => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const item = e.target.closest(".chat-item");
+    if (item) { e.preventDefault(); openChat(item.dataset.id); }
+  });
+
+  // Search
+  $("#searchInput").addEventListener("input", e => {
+    state.query = e.target.value;
+    renderChatList();
+  });
+
+  // Back button (mobile)
+  $("#backBtn").addEventListener("click", closeChat);
+
+  // Composer input
+  input.addEventListener("input", () => { autoGrow(); updateComposer(); });
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener("click", sendMessage);
+
+  // Header actions
+  $("#videoBtn").addEventListener("click", () => toast("Video calls aren't available in this demo"));
+  $("#callBtn").addEventListener("click", () => toast("Voice calls aren't available in this demo"));
+  $("#searchChatBtn").addEventListener("click", () => toast("Search in chat — coming soon"));
+  $("#newChatBtn").addEventListener("click", () => toast("This is a demo — try messaging an existing chat"));
+  $("#attachBtn").addEventListener("click", () => toast("Attachments aren't supported in this demo"));
+  micBtn.addEventListener("click", () => toast("Hold to record — not available in this demo"));
+
+  // Emoji
+  buildEmojiPicker();
+  $("#emojiBtn").addEventListener("click", e => {
+    e.stopPropagation();
+    const p = $("#emojiPicker");
+    p.hidden = !p.hidden;
+    if (!p.hidden) {
+      const last = p.querySelector("button:last-child");
+      if (last) last.scrollIntoView({ block: "nearest" });
+    }
+  });
+  $("#emojiPicker").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (b) insertAtCursor(b.textContent);
+  });
+
+  // Close emoji picker on outside click
+  document.addEventListener("click", e => {
+    const p = $("#emojiPicker");
+    if (p.hidden) return;
+    if (e.target.closest("#emojiPicker") || e.target.closest("#emojiBtn")) return;
+    p.hidden = true;
+  });
+
+  // Theme toggle
+  $("#themeBtn").addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark";
+    applyTheme();
+    save();
+  });
+
+  // Close picker on Escape
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      $("#emojiPicker").hidden = true;
+      if (window.innerWidth <= 820 && document.body.classList.contains("chat-open")) closeChat();
+    }
+  });
+
+  // Keep mobile layout sane on resize
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 820) {
+      // desktop: nothing special
+    }
+  });
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init() {
+  const loaded = load();
+
+  if (!loaded) {
+    state.chats = seedData();
+    state.theme = "light";
+  }
+
+  applyTheme();
+  wireEvents();
+  renderChatList();
+
+  // Auto-open the first chat on wide screens for a nicer first impression
+  if (window.innerWidth > 820 && state.chats.length) {
+    const first = state.chats.slice().sort((a, b) => lastTs(b) - lastTs(a))[0];
+    openChat(first.id);
+  } else {
+    $("#chatEmpty").hidden = false;
+    $("#chatMain").hidden = true;
+  }
+
+  save();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
